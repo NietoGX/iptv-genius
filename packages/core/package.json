@@ -1,0 +1,13 @@
+{
+  "name": "@iptv-genius/core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@iptv/playlist": "^1.2.1",
+    "@iptv/xmltv": "^1.0.1",
+    "@iptv/xtream-api": "^1.4.2",
+    "better-sqlite3": "^13.0.3"
+  }
+}

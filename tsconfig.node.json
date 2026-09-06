@@ -1,0 +1,27 @@
+{
+  "include": [
+    "electron.vite.config.ts",
+    "src/main/**/*",
+    "src/preload/**/*",
+    "packages/core/src/**/*",
+    "packages/ipc-contract/src/**/*"
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["electron-vite/node", "node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "@iptv-genius/core": ["./packages/core/src/index.ts"],
+      "@iptv-genius/core/*": ["./packages/core/src/*"],
+      "@iptv-genius/ipc-contract": ["./packages/ipc-contract/src/index.ts"]
+    }
+  }
+}

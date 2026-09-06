@@ -1,0 +1,28 @@
+{
+  "include": [
+    "src/renderer/src/**/*",
+    "src/preload/index.d.ts",
+    "packages/core/src/**/*",
+    "packages/ipc-contract/src/**/*"
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "@renderer/*": ["./src/renderer/src/*"],
+      "@iptv-genius/core": ["./packages/core/src/index.ts"],
+      "@iptv-genius/core/*": ["./packages/core/src/*"],
+      "@iptv-genius/ipc-contract": ["./packages/ipc-contract/src/index.ts"]
+    }
+  }
+}

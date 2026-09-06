@@ -1,0 +1,23 @@
+appId: com.iptvgenius.app
+productName: IPTV Genius
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+  - package.json
+asarUnpack:
+  - resources/**
+  - node_modules/ffmpeg-static/**
+  - node_modules/better-sqlite3/**
+win:
+  target:
+    - target: nsis
+    - target: portable
+  artifactName: ${productName}-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+npmRebuild: true
