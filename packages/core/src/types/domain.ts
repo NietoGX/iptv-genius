@@ -8,6 +8,8 @@ export interface Source {
   url: string
   username?: string
   password?: string
+  /** XMLTV guide URL declared by the M3U's `url-tvg`/`x-tvg-url` header, if any. */
+  epgUrl: string | null
   createdAt: number
   lastRefreshedAt: number | null
 }
@@ -43,6 +45,20 @@ export interface EpgProgramme {
   description: string | null
   startTs: number
   stopTs: number
+}
+
+/** Source-agnostic programme shape used at the IPC/UI boundary — covers
+ * both DB-backed XMLTV data and ephemeral Xtream short-EPG entries. */
+export interface EpgEntry {
+  title: string
+  description: string | null
+  startTs: number
+  stopTs: number
+}
+
+export interface EpgNowNext {
+  now: EpgEntry | null
+  next: EpgEntry | null
 }
 
 export interface Favorite {

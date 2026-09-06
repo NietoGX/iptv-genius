@@ -1,7 +1,8 @@
-import type { ReactElement } from 'react'
+import { useState, type ReactElement } from 'react'
 import { VideoPlayer } from '../player/VideoPlayer'
 import { FolderColumn } from '../channels/FolderColumn'
 import { ChannelColumn } from '../channels/ChannelColumn'
+import { EpgSearchPanel } from '../epg/EpgSearchPanel'
 import { useUiStore } from '../../state/useUiStore'
 import { useSources } from '../../queries/useSources'
 import { useChannelsByCategory } from '../../queries/useChannels'
@@ -12,6 +13,7 @@ export function BrowseScreen(): ReactElement {
     useUiStore()
   const { data: sources } = useSources()
   const activeSource = sources?.find((s) => s.id === activeSourceId) ?? null
+  const [guideMode, setGuideMode] = useState(false)
 
   const categoryChannels = useChannelsByCategory(
     !activeIsFavorites ? activeSourceId : null,
@@ -28,6 +30,14 @@ export function BrowseScreen(): ReactElement {
           ← Cambiar lista
         </button>
         <h2 className="browse__title">{title}</h2>
+        {!activeIsFavorites && activeSourceId !== null && (
+          <button
+            className={guideMode ? 'browse__guide-toggle browse__guide-toggle--active' : 'browse__guide-toggle'}
+            onClick={() => setGuideMode((v) => !v)}
+          >
+            {guideMode ? '← Volver a canales' : '📅 Guía'}
+          </button>
+        )}
       </header>
 
       <section className="browse__player">
@@ -35,7 +45,9 @@ export function BrowseScreen(): ReactElement {
       </section>
 
       <section className="browse__body">
-        {activeIsFavorites ? (
+        {guideMode && activeSourceId !== null ? (
+          <EpgSearchPanel sourceId={activeSourceId} />
+        ) : activeIsFavorites ? (
           <ChannelColumn
             channels={favorites.data ?? []}
             isLoading={favorites.isLoading}

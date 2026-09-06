@@ -1,7 +1,7 @@
 import type { Database } from 'better-sqlite3'
 import type { Channel, ChannelKind } from '../../types/domain'
 
-interface ChannelRow {
+export interface ChannelRow {
   id: number
   source_id: number
   kind: ChannelKind
@@ -13,7 +13,7 @@ interface ChannelRow {
   xtream_stream_id: string | null
 }
 
-function rowToChannel(row: ChannelRow): Channel {
+export function rowToChannel(row: ChannelRow): Channel {
   return {
     id: row.id,
     sourceId: row.source_id,
@@ -114,6 +114,17 @@ export function createChannelsRepo(db: Database) {
         | ChannelRow
         | undefined
       return row ? rowToChannel(row) : null
+    },
+
+    /** Every distinct tvg_id in use by a source — used to drop EPG programme
+     * rows for channels that aren't actually in this source before storing
+     * them (a full XMLTV/xmltv.php guide often covers far more channels
+     * worldwide than any one playlist actually has). */
+    listTvgIds(sourceId: number): string[] {
+      const rows = db
+        .prepare('SELECT DISTINCT tvg_id FROM channels WHERE source_id = ? AND tvg_id IS NOT NULL')
+        .all(sourceId) as { tvg_id: string }[]
+      return rows.map((r) => r.tvg_id)
     }
   }
 }

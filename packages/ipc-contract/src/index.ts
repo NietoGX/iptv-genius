@@ -2,6 +2,9 @@ import type {
   Channel,
   ChannelCategory,
   ChannelKind,
+  EpgEntry,
+  EpgNowNext,
+  EpgSearchResult,
   FavoriteCategory,
   Source,
   XtreamCredentials
@@ -63,6 +66,17 @@ export interface IptvApi {
      * Chromium's MSE can't decode natively. */
     getTranscodeUrl(url: string): Promise<string>
   }
+  epg: {
+    getNowNext(channelId: number): Promise<EpgNowNext>
+    /** Full upcoming (or currently airing) schedule for one channel — not
+     * just now/next. */
+    getSchedule(channelId: number): Promise<EpgEntry[]>
+    /** Searches programme titles across every channel in a source. */
+    search(sourceId: number, query: string): Promise<EpgSearchResult[]>
+    /** Whether any guide data has been downloaded for this source yet —
+     * lets the UI distinguish "still loading" from "no matches". */
+    hasGuideData(sourceId: number): Promise<boolean>
+  }
 }
 
 export const IPC_CHANNELS = {
@@ -81,5 +95,9 @@ export const IPC_CHANNELS = {
   favoritesAddCategory: 'favorites:addCategory',
   favoritesRemoveCategory: 'favorites:removeCategory',
   playerOpenExternal: 'player:openExternal',
-  playerGetTranscodeUrl: 'player:getTranscodeUrl'
+  playerGetTranscodeUrl: 'player:getTranscodeUrl',
+  epgGetNowNext: 'epg:getNowNext',
+  epgGetSchedule: 'epg:getSchedule',
+  epgSearch: 'epg:search',
+  epgHasGuideData: 'epg:hasGuideData'
 } as const

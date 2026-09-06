@@ -8,6 +8,7 @@ interface SourceRow {
   url: string
   username: string | null
   password: string | null
+  epg_url: string | null
   created_at: number
   last_refreshed_at: number | null
 }
@@ -20,6 +21,7 @@ function rowToSource(row: SourceRow): Source {
     url: row.url,
     username: row.username ?? undefined,
     password: row.password ?? undefined,
+    epgUrl: row.epg_url,
     createdAt: row.created_at,
     lastRefreshedAt: row.last_refreshed_at
   }
@@ -31,6 +33,7 @@ export interface NewSource {
   url: string
   username?: string
   password?: string
+  epgUrl?: string | null
 }
 
 export function createSourcesRepo(db: Database) {
@@ -39,8 +42,8 @@ export function createSourcesRepo(db: Database) {
       const createdAt = Date.now()
       const result = db
         .prepare(
-          `INSERT INTO sources (type, name, url, username, password, created_at, last_refreshed_at)
-           VALUES (@type, @name, @url, @username, @password, @createdAt, NULL)`
+          `INSERT INTO sources (type, name, url, username, password, epg_url, created_at, last_refreshed_at)
+           VALUES (@type, @name, @url, @username, @password, @epgUrl, @createdAt, NULL)`
         )
         .run({
           type: source.type,
@@ -48,6 +51,7 @@ export function createSourcesRepo(db: Database) {
           url: source.url,
           username: source.username ?? null,
           password: source.password ?? null,
+          epgUrl: source.epgUrl ?? null,
           createdAt
         })
 
@@ -58,6 +62,7 @@ export function createSourcesRepo(db: Database) {
         url: source.url,
         username: source.username,
         password: source.password,
+        epgUrl: source.epgUrl ?? null,
         createdAt,
         lastRefreshedAt: null
       }
@@ -81,6 +86,10 @@ export function createSourcesRepo(db: Database) {
 
     markRefreshed(id: number): void {
       db.prepare('UPDATE sources SET last_refreshed_at = ? WHERE id = ?').run(Date.now(), id)
+    },
+
+    setEpgUrl(id: number, epgUrl: string | null): void {
+      db.prepare('UPDATE sources SET epg_url = ? WHERE id = ?').run(epgUrl, id)
     }
   }
 }

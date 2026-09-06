@@ -29,6 +29,12 @@ const api: IptvApi = {
   player: {
     openExternal: (url) => ipcRenderer.invoke(IPC_CHANNELS.playerOpenExternal, url),
     getTranscodeUrl: (url) => ipcRenderer.invoke(IPC_CHANNELS.playerGetTranscodeUrl, url)
+  },
+  epg: {
+    getNowNext: (channelId) => ipcRenderer.invoke(IPC_CHANNELS.epgGetNowNext, channelId),
+    getSchedule: (channelId) => ipcRenderer.invoke(IPC_CHANNELS.epgGetSchedule, channelId),
+    search: (sourceId, query) => ipcRenderer.invoke(IPC_CHANNELS.epgSearch, sourceId, query),
+    hasGuideData: (sourceId) => ipcRenderer.invoke(IPC_CHANNELS.epgHasGuideData, sourceId)
   }
 }
 

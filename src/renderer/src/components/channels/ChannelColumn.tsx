@@ -5,7 +5,7 @@ import { ChannelRow } from './ChannelRow'
 import { useFavorites, useToggleFavorite } from '../../queries/useFavorites'
 import { useUiStore } from '../../state/useUiStore'
 
-const ROW_HEIGHT = 44
+const ROW_HEIGHT = 56
 
 interface ChannelColumnProps {
   channels: Channel[]

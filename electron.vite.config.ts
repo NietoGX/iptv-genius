@@ -10,6 +10,14 @@ export default defineConfig({
         '@iptv-genius/core': resolve('packages/core/src'),
         '@iptv-genius/ipc-contract': resolve('packages/ipc-contract/src')
       }
+    },
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve('src/main/index.ts'),
+          epgWorker: resolve('src/main/workers/epgWorker.ts')
+        }
+      }
     }
   },
   preload: {

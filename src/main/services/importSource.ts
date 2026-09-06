@@ -9,6 +9,18 @@ import {
   type Source
 } from '@iptv-genius/core'
 import type { AddM3uInput, AddM3uResult, AddXtreamInput } from '@iptv-genius/ipc-contract'
+import { refreshEpgForSource } from './epgService'
+
+/** EPG refresh is intentionally not awaited by callers — it can take a few
+ * seconds (download + parse) and the UI shouldn't block on it. Failures are
+ * logged rather than surfaced, since a missing guide shouldn't fail the
+ * whole "add source" flow. Xtream sources always have a guide URL (derived
+ * from credentials), m3u sources only if the playlist declared `url-tvg`. */
+function refreshEpgInBackground(db: AppDatabase, source: Source): void {
+  refreshEpgForSource(db, source).catch((error) => {
+    console.error(`EPG refresh failed for source ${source.id}:`, error)
+  })
+}
 
 async function fetchM3uContent(url: string): Promise<string> {
   if (/^https?:\/\//i.test(url)) {
@@ -34,10 +46,16 @@ export async function importM3uSource(
   const content = await fetchM3uContent(input.url)
   const parsed = parseM3uPlaylist(content)
 
-  const source = db.sources.add({ type: 'm3u', name: input.name, url: input.url })
+  const source = db.sources.add({
+    type: 'm3u',
+    name: input.name,
+    url: input.url,
+    epgUrl: parsed.epgUrl
+  })
   const channels: NewChannel[] = parsed.channels.map((c) => ({ ...c, sourceId: source.id }))
   db.channels.replaceForSource(source.id, channels)
   db.sources.markRefreshed(source.id)
+  refreshEpgInBackground(db, source)
 
   const detection = detectXtreamSource(parsed.channels.map((c) => c.streamUrl))
 
@@ -92,6 +110,7 @@ export async function importXtreamSource(
   const channels = await pullXtreamLiveChannels(source, account)
   db.channels.replaceForSource(source.id, channels)
   db.sources.markRefreshed(source.id)
+  refreshEpgInBackground(db, source)
 
   return source
 }
@@ -105,6 +124,8 @@ export async function refreshSource(db: AppDatabase, sourceId: number): Promise<
     const parsed = parseM3uPlaylist(content)
     const channels: NewChannel[] = parsed.channels.map((c) => ({ ...c, sourceId: source.id }))
     db.channels.replaceForSource(source.id, channels)
+    db.sources.setEpgUrl(source.id, parsed.epgUrl)
+    refreshEpgInBackground(db, { ...source, epgUrl: parsed.epgUrl })
   } else {
     const account = new XtreamAccount({
       baseUrl: source.url,
@@ -113,6 +134,7 @@ export async function refreshSource(db: AppDatabase, sourceId: number): Promise<
     })
     const channels = await pullXtreamLiveChannels(source, account)
     db.channels.replaceForSource(source.id, channels)
+    refreshEpgInBackground(db, source)
   }
 
   db.sources.markRefreshed(source.id)

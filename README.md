@@ -12,6 +12,7 @@ A fast, native-feeling IPTV desktop app for Windows. Import M3U/M3U8 playlists o
 - **Two-column browsing** — pick a folder, then its channels, both virtualized so huge playlists stay instant and responsive.
 - **Per-column search** — filter folders and channels independently, entirely client-side (no lag).
 - **Favorites** — star individual channels *and* whole folders for quick access.
+- **EPG** — a now/next progress bar per channel, a full upcoming-schedule view per channel, and a guide-wide search ("what's showing tonight?") across every channel in a source. Sourced from XMLTV (the M3U's `url-tvg`, or Xtream's `xmltv.php` for a full multi-day guide) parsed off the main thread in a worker, with live `get_short_epg` as a per-channel fallback when a channel isn't covered by the stored guide.
 - **Multi-format playback** — routes HLS to `hls.js` and raw MPEG-TS to `mpegts.js`, whichever the stream needs.
 - **Playback fallbacks for tricky streams** — some IPTV feeds use audio codecs (e.g. MP2, AC-3/EAC-3) that Chromium's Media Source Extensions can't decode. When that happens, IPTV Genius offers to either open the stream in VLC/mpv, or transparently transcode just the audio track locally (via a bundled `ffmpeg`, video is stream-copied, not re-encoded) and retry in-app.
 
@@ -68,7 +69,8 @@ iptv-genius/
 ## Roadmap
 
 - [x] Playlist/Xtream import, live playback, folders, favorites, search
-- [ ] EPG (XMLTV + Xtream short EPG) with a now/next guide
+- [x] EPG (XMLTV + Xtream `xmltv.php`) with now/next, per-channel schedule, and guide-wide search
+- [ ] Visual EPG grid/timeline (channels × time), rather than list-based schedule/search
 - [ ] VOD (movies) and series browsing with resume playback
 - [ ] Packaging polish (code signing, auto-update)
 

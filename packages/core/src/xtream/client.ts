@@ -39,6 +39,30 @@ function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : []
 }
 
+/** Many Xtream panels base64-encode EPG title/description fields (so
+ * special characters survive their JSON encoding); others send plain text.
+ * Short plain-text titles (e.g. "News", "Kids", "Deportes") can coincidentally
+ * match the base64 charset/length, so a naive decode-and-check-printable
+ * heuristic corrupts them — decoding "Kids" as base64 "succeeds" and produces
+ * three garbage-but-printable bytes. Guard against that two ways: require a
+ * minimum length (real encoded titles are always longer than that), and
+ * require the decoded text to round-trip back to the exact original string —
+ * random bytes essentially never do, but genuine base64 always does. */
+function decodeMaybeBase64(value: string): string {
+  if (value.length < 8 || value.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) {
+    return value
+  }
+  try {
+    const decoded = Buffer.from(value, 'base64').toString('utf-8')
+    if (decoded.length > 0 && Buffer.from(decoded, 'utf-8').toString('base64') === value) {
+      return decoded
+    }
+  } catch {
+    // Matched the charset but wasn't valid base64 — keep the original.
+  }
+  return value
+}
+
 /** Thin, typed wrapper around @iptv/xtream-api exposing our own domain
  * vocabulary, so the rest of the app never imports the upstream library
  * directly (keeps the door open to swapping it later). */
@@ -175,12 +199,15 @@ export class XtreamAccount {
     const listings = asArray<{ title: string; description: string | null; start: string; end: string }>(
       (response as { epg_listings?: unknown })?.epg_listings
     )
-    return listings.map((entry) => ({
-      title: entry.title,
-      description: asString(entry.description),
-      start: new Date(entry.start),
-      stop: new Date(entry.end)
-    }))
+    return listings.map((entry) => {
+      const description = asString(entry.description)
+      return {
+        title: decodeMaybeBase64(entry.title),
+        description: description ? decodeMaybeBase64(description) : null,
+        start: new Date(entry.start),
+        stop: new Date(entry.end)
+      }
+    })
   }
 
   liveStreamUrl(streamId: string, extension = 'ts'): string {

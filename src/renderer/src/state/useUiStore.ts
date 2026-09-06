@@ -11,44 +11,44 @@ interface UiState {
    * `undefined` = no folder chosen yet; `null` is itself a real folder value
    * (channels with no group_title, shown as "Sin categoría"). */
   selectedCategory: string | null | undefined
-  searchQuery: string
   nowPlaying: Channel | null
+  /** Channel whose full EPG schedule modal is open, if any. */
+  scheduleChannel: Channel | null
   openSource: (sourceId: number) => void
   openFavorites: () => void
   closeSource: () => void
   openCategory: (groupTitle: string | null) => void
-  setSearchQuery: (value: string) => void
   play: (channel: Channel) => void
+  openSchedule: (channel: Channel) => void
+  closeSchedule: () => void
 }
 
 export const useUiStore = create<UiState>((set) => ({
   activeSourceId: null,
   activeIsFavorites: false,
   selectedCategory: undefined,
-  searchQuery: '',
   nowPlaying: null,
+  scheduleChannel: null,
   openSource: (sourceId) =>
     set({
       activeSourceId: sourceId,
       activeIsFavorites: false,
-      selectedCategory: undefined,
-      searchQuery: ''
+      selectedCategory: undefined
     }),
   openFavorites: () =>
     set({
       activeSourceId: null,
       activeIsFavorites: true,
-      selectedCategory: undefined,
-      searchQuery: ''
+      selectedCategory: undefined
     }),
   closeSource: () =>
     set({
       activeSourceId: null,
       activeIsFavorites: false,
-      selectedCategory: undefined,
-      searchQuery: ''
+      selectedCategory: undefined
     }),
   openCategory: (groupTitle) => set({ selectedCategory: groupTitle }),
-  setSearchQuery: (value) => set({ searchQuery: value }),
-  play: (channel) => set({ nowPlaying: channel })
+  play: (channel) => set({ nowPlaying: channel }),
+  openSchedule: (channel) => set({ scheduleChannel: channel }),
+  closeSchedule: () => set({ scheduleChannel: null })
 }))

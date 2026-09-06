@@ -1,0 +1,1 @@
+ALTER TABLE sources ADD COLUMN epg_url TEXT;
