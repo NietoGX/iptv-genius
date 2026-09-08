@@ -21,3 +21,17 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
 npmRebuild: true
+mac:
+  target:
+    - target: dmg
+    - target: zip
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  category: public.app-category.entertainment
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
