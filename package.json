@@ -5,7 +5,8 @@
   "description": "Windows IPTV desktop app (M3U + Xtream Codes)",
   "main": "./out/main/index.js",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "dev": "electron-vite dev",
